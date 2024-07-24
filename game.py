@@ -2,12 +2,12 @@
 import pygame
 import sys
 from modules.Board import Board
+from modules.GamePiece import Snake
 
 def runGame():
     pygame.init()
-    gameBoard = Board((400,400),(20,20))
+    snake = Snake(200,200)
     while True:
-        print('in while')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

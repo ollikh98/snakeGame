@@ -16,9 +16,9 @@ class Board:
         self.drawGrid()
         
     def drawGrid(self):
+        
         for x in range(0,self.resolution[0],self.blocksize):
             for y in range(0,self.resolution[1],self.blocksize):
-                print((x,y))
                 rect = pygame.Rect(x,y,self.blocksize,self.blocksize)
                 pygame.draw.rect(self.board,WHITE,rect,1)
                 pygame.display.update()
