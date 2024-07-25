@@ -6,8 +6,10 @@ from modules.GamePiece import Snake
 
 def runGame():
     pygame.init()
-    snake = Snake(200,200)
+    board = Board((400,400),(10,10))
+    snake = Snake((5,5),board)
     while True:
+        snake.testCoord()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
