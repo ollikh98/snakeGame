@@ -1,4 +1,5 @@
 import pygame
+from bidict import bidict
 
 # from GamePiece import Snake, Apple
 
@@ -30,27 +31,32 @@ class Board:
         return (int(tileWidth),int(tileHeight))
         
     def makeMapCoord(self):
-        row = 0
-        col = 0
-        rowDict = {} 
-        colDict = {}
+        #uses bidict to have a key<->key pairing for screen to game coordinates
+        gridPos = 0
+        mapDict = {}
+        
         for x in range(0,self.resolution[0],self.blocksize):
-            rowDict[range(x,x+self.blocksize)] =  (row,x)
-            row +=1 
+            mapDict[range(x,x+self.blocksize)] =  gridPos
+            gridPos +=1 
             
-        for y in range(0,self.resolution[1],self.blocksize):
-            colDict[range(y,y+self.blocksize)] =  (col,y)
-            col += 1 
-            
-        return (colDict, rowDict)
-    
+        return bidict(mapDict)
+        
     def screenToGameCoord(self,pos):
         x,y = pos
-        gameX = [self.map[0][gamePos] for gamePos in self.map[0] if x in gamePos][0]
-        gameY = [self.map[1][gamePos] for gamePos in self.map[1] if y in gamePos][0]
-                
-        return (gameX,gameY)
+        gameX = [self.map[screenPos] for screenPos in self.map if x in screenPos][0]
+        gameY = [self.map[screenPos] for screenPos in self.map if y in screenPos][0]
+        
+        return(gameX,gameY)
     
+    def gameToScreenCord(self,pos):
+        x,y = pos
+        
+        screenX = self.map.inverse[x]
+        screenY = self.map.inverse[y]
+        screenX = screenX[0]
+        screenY = screenY[0]
+        
+        return (screenX,screenY)
     
         
         
