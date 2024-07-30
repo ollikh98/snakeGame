@@ -22,7 +22,6 @@ class Board:
             for y in range(0,self.resolution[1],self.blocksize):
                 rect = pygame.Rect(x,y,self.blocksize,self.blocksize)
                 pygame.draw.rect(self.board,WHITE,rect,1)
-                pygame.display.update()
     
     def tileSize(self):
         tileWidth = (self.resolution[0] / self.width) 
@@ -58,6 +57,10 @@ class Board:
         
         return (screenX,screenY)
     
+    def updateFrame(self):
+        self.board.fill(BLACK)
+        self.drawGrid()
+        
         
         
         

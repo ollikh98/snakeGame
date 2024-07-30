@@ -16,7 +16,13 @@ class GamePiece(pygame.sprite.Sprite):
     
     def updatePosInfo(self,newPos): 
         self.gamePos = newPos
-        self.screenPos = self.board.gameToScreenCord(newPos)       
+        self.screenPos = self.board.gameToScreenCord(newPos)
+        
+    def draw(self):
+        self.rect.update((self.screenPos),(self.size,self.size))
+        pygame.draw.rect(self.board.board,self.color,self.rect)
+        
+     
 
 class Snake():
     def __init__(self, pos, board: Board):
@@ -28,12 +34,9 @@ class Snake():
         mousepos = pygame.mouse.get_pos()
         mousepos = self.board.screenToGameCoord(mousepos)
         if mousepos != self.head.gamePos and pygame.mouse.get_focused():
-            print(mousepos)
             self.head.updatePosInfo(mousepos)
-            self.head.rect.update((self.head.screenPos),(self.head.size,self.head.size))
-            
-            pygame.draw.rect(self.board.board,self.head.color,self.head.rect)
-
+            self.board.updateFrame()
+            self.head.draw()
         
     
     
