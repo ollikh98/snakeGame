@@ -17,7 +17,7 @@ def runGame():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        clock.tick(60)
+        clock.tick(30)
         pygame.display.flip()
 if __name__ == "__main__":
     runGame()
