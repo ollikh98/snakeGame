@@ -1,14 +1,14 @@
-
 import pygame
 import sys
 from modules.Board import Board
 from modules.GamePiece import Snake
 
+
 def runGame():
     pygame.init()
-    pygame.key.set_repeat(50,200)
-    board = Board((400,400),(10,10))
-    snake = Snake((4,4),board)
+    pygame.key.set_repeat(50, 200)
+    board = Board((400, 400), (10, 10))
+    snake = Snake((4, 4), board)
     snake.head.draw()
     clock = pygame.time.Clock()
     while True:
@@ -17,7 +17,9 @@ def runGame():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        clock.tick(30)
         pygame.display.flip()
+        clock.tick(60)
+
+
 if __name__ == "__main__":
     runGame()
