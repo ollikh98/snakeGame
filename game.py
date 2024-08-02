@@ -21,7 +21,7 @@ def gamestart():
 
     return snake
 def runGame(snake):
-    collisionDetection = snake.head.move()
+    collisionDetection = snake.move()
 
     return collisionDetection
 
