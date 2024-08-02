@@ -14,7 +14,7 @@ class GamePiece(pygame.sprite.Sprite):
         self.gamePos = gamePos
         self.screenPos = board.gameToScreenCord(self.gamePos)
         self.screen = screen
-        self.dir = LEFT
+        self.dir = RIGHT
         self.board = board
         self.color = 'green'
         self.size = size
@@ -35,7 +35,6 @@ class GamePiece(pygame.sprite.Sprite):
 
     def move(self):
         keys = pygame.key.get_pressed()
-        prevX, prevY = self.gamePos
         newX, newY = self.gamePos
 
         if keys[pygame.K_LEFT] and self.dir != RIGHT:
@@ -58,17 +57,25 @@ class GamePiece(pygame.sprite.Sprite):
 
         self.movementTicker += 1
 
-        if newX not in self.board.map.inverse:
-            newX = prevX
-            print('attempting to go out of bounds')
-        if newY not in self.board.map.inverse:
-            newY = prevY
-            print('attempting to go out of bounds')
+        collision = self.collisionDetection(newX, newY)
+
+        if collision == -1:
+            return -1
 
         newPos = (newX, newY)
         self.updatePosInfo(newPos)
         self.board.updateFrame()
         self.draw()
+
+
+    def collisionDetection(self,newX,newY):
+        if newX not in self.board.map.inverse:
+            print('attempting to go out of bounds')
+            return -1
+        if newY not in self.board.map.inverse:
+            print('attempting to go out of bounds')
+            return -1
+
 
 
 class Snake():
