@@ -29,3 +29,4 @@ class Board:
         self.board.fill(BLACK)
         self.drawGrid()
         self.snake.head.draw(self.board)
+        self.apple.draw(self.board)
