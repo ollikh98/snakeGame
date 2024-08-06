@@ -1,6 +1,8 @@
 import pygame
 import numpy as np
-from modules.Board import Board
+import random
+import bidict
+from modules import Utils
 from copy import deepcopy
 
 # DIRECTION CONSTANTS
@@ -10,45 +12,58 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 
 class GamePiece(pygame.sprite.Sprite):
-    def __init__(self, board: Board, screen, gamePos, size, next=None):
+    def __init__(self, map: bidict, gamePos, size, color, next=None):
+        self.map = map
         self.gamePos = gamePos
-        self.screenPos = board.gameToScreenCord(self.gamePos)
-        self.screen = screen
-        self.board = board
-        self.color = 'green'
+        self.screenPos = Utils.gameToScreenCord(self.map, self.gamePos)
+        self.color = color
         self.size = size
         self.rect = pygame.Rect(self.screenPos[0], self.screenPos[1], size, size)
         if not next:
             self.next = self
-        pygame.draw.rect(screen, self.color, self.rect)
 
-    def updatePosInfo(self, newGamePos):
+    def updatePosInfo(self, map, newGamePos):
         self.gamePos = newGamePos
-        self.screenPos = self.board.gameToScreenCord(newGamePos)
+        self.screenPos = Utils.gameToScreenCord(map, newGamePos)
 
-    def draw(self):
+    def draw(self, screen):
         self.rect.update(self.screenPos, (self.size, self.size))
-        pygame.draw.rect(self.board.board, self.color, self.rect)
+        pygame.draw.rect(screen, self.color, self.rect)
 
 
     def collisionDetection(self,newX,newY):
-        if newX not in self.board.map.inverse:
+        if newX not in self.map.inverse:
             print('attempting to go out of bounds')
             return -1
-        if newY not in self.board.map.inverse:
+        if newY not in self.map.inverse:
             print('attempting to go out of bounds')
             return -1
 
+# TODO: restructure board,snake gamepiece link, board should contain all pieces
+class Apple(GamePiece):
+    def __init__(self, map, size, color):
+        super().__init__(map, Utils.generateRandomGamePos(map), size, color)
+        self.mapsize = len(map)
+
+    def collected(self, snakePos):
+        if snakePos == self.gamePos:
+            self.gamePos = Utils.generateRandomGamePos(self.map)
+            newX = random.randint(0,self.mapsize)
+            newY = random.randint(0,self.mapsize)
+            self.gamePos = (newX,newY)
+            self.screenPos = Utils.gameToScreenCord(self.gamePos)
 
 
 class Snake():
-    def __init__(self, pos, board: Board):
-        self.board = board
-        self.head = GamePiece(self.board, self.board.board, pos, self.board.blocksize)
-        self.mousepos = self.board.screenToGameCoord(pygame.mouse.get_pos())
+    def __init__(self, gameMap, pos, size):
+        self.head = GamePiece(gameMap, pos, size, 'green')
+        self.body = []
+        self.body.append(self.head)
         self.movementTicker = 0
         self.canMove = True
         self.dir = RIGHT
+        # self.mousepos = self.board.screenToGameCoord(pygame.mouse.get_pos())
+
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -80,9 +95,12 @@ class Snake():
             return -1
 
         newPos = (newX, newY)
-        self.head.updatePosInfo(newPos)
-        self.board.updateFrame()
-        self.head.draw()
+        self.head.updatePosInfo(self.head.map, newPos)
+
+    def draw(self, screen):
+        for part in self.body:
+            part.draw(screen)
+
 
     def testCoord(self):
         mousepos = pygame.mouse.get_pos()

@@ -2,15 +2,21 @@ import pygame
 import sys
 import time
 from modules.Board import Board
-from modules.GamePiece import Snake
+from modules.GamePiece import Snake, Apple
+from modules.Utils import calctileSize, makeMap
 
 
 def gamestart():
     pygame.init()
     pygame.key.set_repeat(50, 200)
-    board = Board((400, 400), (10, 10))
-    snake = Snake((4, 4), board)
-    snake.head.draw()
+    resolution = (400,400)
+    mapsize = (10,10)
+    tilesize, _ = calctileSize(resolution,mapsize)
+    map = makeMap(resolution,tilesize)
+    print(map)
+    snake = Snake(map,(4,4),tilesize)
+    apple = Apple(map,tilesize,color='red')
+    board = Board(map, resolution,mapsize,tilesize,snake,apple)
     print('3..')
     time.sleep(1)
     print('2..')
@@ -19,19 +25,18 @@ def gamestart():
     time.sleep(1)
     print('GO! ')
 
-    return snake
+    return board
 def runGame(snake):
     collisionDetection = snake.move()
-
     return collisionDetection
 
 
 if __name__ == "__main__":
     clock = pygame.time.Clock()
     while True:
-        snake = gamestart()
+        board = gamestart()
         while True:
-            collision = runGame(snake)
+            collision = runGame(board.snake)
             if collision == -1:
                 print('COLLISION - RESTARTING')
                 break
@@ -42,3 +47,4 @@ if __name__ == "__main__":
 
             pygame.display.flip()
             clock.tick(60)
+            board.updateFrame()
