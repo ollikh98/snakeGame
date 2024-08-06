@@ -26,8 +26,9 @@ def gamestart():
     print('GO! ')
 
     return board
-def runGame(snake):
+def runGame(snake, apple):
     collisionDetection = snake.move()
+    apple.collected(snake.head.gamePos)
     return collisionDetection
 
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     while True:
         board = gamestart()
         while True:
-            collision = runGame(board.snake)
+            collision = runGame(board.snake, board.apple)
             if collision == -1:
                 print('COLLISION - RESTARTING')
                 break

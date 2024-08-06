@@ -30,3 +30,4 @@ class Board:
         self.drawGrid()
         self.snake.head.draw(self.board)
         self.apple.draw(self.board)
+

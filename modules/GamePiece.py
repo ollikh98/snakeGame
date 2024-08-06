@@ -48,10 +48,10 @@ class Apple(GamePiece):
     def collected(self, snakePos):
         if snakePos == self.gamePos:
             self.gamePos = Utils.generateRandomGamePos(self.map)
-            newX = random.randint(0,self.mapsize)
-            newY = random.randint(0,self.mapsize)
+            newX = random.randint(0, self.mapsize-1)
+            newY = random.randint(0, self.mapsize-1)
             self.gamePos = (newX,newY)
-            self.screenPos = Utils.gameToScreenCord(self.gamePos)
+            self.screenPos = Utils.gameToScreenCord(self.map, self.gamePos)
 
 
 class Snake():
