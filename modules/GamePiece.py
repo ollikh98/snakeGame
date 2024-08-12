@@ -10,26 +10,47 @@ UP = (0, -1)
 DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
+STILL = (0, 0)
 
 class GamePiece(pygame.sprite.Sprite):
-    def __init__(self, map: bidict, gamePos, size, color, next=None):
+    def __init__(self, map: bidict, gamePos, size, color, dir=STILL):
         self.map = map
         self.gamePos = gamePos
         self.screenPos = Utils.gameToScreenCord(self.map, self.gamePos)
         self.color = color
         self.size = size
         self.rect = pygame.Rect(self.screenPos[0], self.screenPos[1], size, size)
-        if not next:
-            self.next = self
+        self.next = self
+        self.dir = dir
+        self.prevDir = dir
 
-    def updatePosInfo(self, map, newGamePos):
+    def updatePosInfo(self,newGamePos):
         self.gamePos = newGamePos
-        self.screenPos = Utils.gameToScreenCord(map, newGamePos)
+        self.screenPos = Utils.gameToScreenCord(self.map, newGamePos)
+
+    def movePiece(self):
+        print(self.gamePos)
+        newPos = tuple(np.add(self.gamePos,self.dir))
+        self.gamePos = newPos
+        self.screenPos = Utils.gameToScreenCord(self.map,self.gamePos)
+
+    def getGamePos(self):
+        return self.gamePos
 
     def draw(self, screen):
         self.rect.update(self.screenPos, (self.size, self.size))
         pygame.draw.rect(screen, self.color, self.rect)
 
+    def __str__(self):
+        return (
+            f' Gamepiece attributes: \n'
+            f' map: {self.map} \n'
+            f' gamePos: {self.gamePos} \n'
+            f' screenPos: {self.screenPos} \n'
+            f' color: {self.color} \n'
+            f' size: {self.size} \n'
+            f' dir: {self.dir} \n'
+        )
 
     def collisionDetection(self,newX,newY):
         if newX not in self.map.inverse:
@@ -39,7 +60,6 @@ class GamePiece(pygame.sprite.Sprite):
             print('attempting to go out of bounds')
             return -1
 
-# TODO: restructure board,snake gamepiece link, board should contain all pieces
 class Apple(GamePiece):
     def __init__(self, map, size, color):
         super().__init__(map, Utils.generateRandomGamePos(map), size, color)
@@ -52,6 +72,8 @@ class Apple(GamePiece):
             newY = random.randint(0, self.mapsize-1)
             self.gamePos = (newX,newY)
             self.screenPos = Utils.gameToScreenCord(self.map, self.gamePos)
+            return True
+        return False
 
 
 class Snake():
@@ -60,42 +82,48 @@ class Snake():
         self.body = []
         self.body.append(self.head)
         self.movementTicker = 0
-        self.canMove = True
-        self.dir = RIGHT
+        self.canMove = False
         # self.mousepos = self.board.screenToGameCoord(pygame.mouse.get_pos())
 
 
+    def addBody(self):
+        lastPiece = self.body[-1]
+        newPos = tuple(np.subtract(lastPiece.gamePos, lastPiece.dir))
+        newPiece = GamePiece(lastPiece.map, newPos, lastPiece.size, color='green', dir=lastPiece.dir)
+        self.body[-1].next = newPiece
+        self.body.append(newPiece)
     def move(self):
-        keys = pygame.key.get_pressed()
-        newX, newY = self.head.gamePos
 
-        if keys[pygame.K_LEFT] and self.dir != RIGHT:
-            self.dir = LEFT
-        if keys[pygame.K_RIGHT] and self.dir != LEFT:
-            self.dir = RIGHT
-        if keys[pygame.K_UP] and self.dir != DOWN:
-            self.dir = UP
-        if keys[pygame.K_DOWN] and self.dir != UP:
-            self.dir = DOWN
+        keys = pygame.key.get_pressed()
+        self.head.prevDir = self.head.dir
+        if keys[pygame.K_LEFT] and self.head.dir != RIGHT:
+            self.head.dir = LEFT
+        if keys[pygame.K_RIGHT] and self.head.dir != LEFT:
+            self.head.dir = RIGHT
+        if keys[pygame.K_UP] and self.head.dir != DOWN:
+            self.head.dir = UP
+        if keys[pygame.K_DOWN] and self.head.dir != UP:
+            self.head.dir = DOWN
 
         # no key pressed and time to move
-        if self.movementTicker >= 10:
+        if self.movementTicker >= 20:
+            print('can move')
             self.canMove = True
 
         if self.canMove:
-            newX, newY = tuple(np.add(self.head.gamePos, self.dir))
+            for piece in self.body:
+                print(piece.dir)
+                piece.movePiece()
             self.canMove = False
             self.movementTicker = 0
 
         self.movementTicker += 1
 
-        collision = self.head.collisionDetection(newX, newY)
+        headX, headY = self.head.gamePos
+        collision = self.head.collisionDetection(headX, headY)
 
         if collision == -1:
             return -1
-
-        newPos = (newX, newY)
-        self.head.updatePosInfo(self.head.map, newPos)
 
     def draw(self, screen):
         for part in self.body:

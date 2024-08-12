@@ -28,6 +28,6 @@ class Board:
     def updateFrame(self):
         self.board.fill(BLACK)
         self.drawGrid()
-        self.snake.head.draw(self.board)
+        self.snake.draw(self.board)
         self.apple.draw(self.board)
 

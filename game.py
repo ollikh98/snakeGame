@@ -27,8 +27,10 @@ def gamestart():
 
     return board
 def runGame(snake, apple):
+    appleCollected = apple.collected(snake.head.gamePos)
+    if appleCollected:
+        snake.addBody()
     collisionDetection = snake.move()
-    apple.collected(snake.head.gamePos)
     return collisionDetection
 
 
