@@ -1,45 +1,48 @@
 import random
 from bidict import bidict
-def screenToGameCoord(coord_mapping, pos):
+
+
+def screen_to_game_coord(coord_mapping, pos):
     x, y = pos
-    gameX = [coord_mapping[screenPos] for screenPos in coord_mapping if x in screenPos][0]
-    gameY = [coord_mapping[screenPos] for screenPos in coord_mapping if y in screenPos][0]
+    game_x = [coord_mapping[screen_pos] for screen_pos in coord_mapping if x in screen_pos][0]
+    game_y = [coord_mapping[screen_pos] for screen_pos in coord_mapping if y in screen_pos][0]
 
-    return (gameX, gameY)
+    return game_x, game_y
 
 
-def gameToScreenCord(coord_mapping,pos):
+def game_to_screen_coord(coord_mapping, pos):
     x, y = pos
 
-    screenX = coord_mapping.inverse[x]
-    screenY = coord_mapping.inverse[y]
-    screenX = screenX[0]
-    screenY = screenY[0]
+    screen_x = coord_mapping.inverse[x]
+    screen_y = coord_mapping.inverse[y]
+    screen_x = screen_x[0]
+    screen_y = screen_y[0]
 
-    return (screenX, screenY)
-
-def generateRandomGamePos(coord_mapping):
-    mapsize = len(coord_mapping)-1
-    newX = random.randint(0,mapsize)
-    newY = random.randint(0, mapsize)
-    return (newX,newY)
+    return screen_x, screen_y
 
 
-def calctileSize(resolution,mapsize):
-    width, height = mapsize
-    tileWidth = (resolution[0] / width)
-    tileHeight = (resolution[1] / height)
+def random_game_pos(coord_mapping):
+    grid_size = len(coord_mapping) - 1
+    new_x = random.randint(0, grid_size)
+    new_y = random.randint(0, grid_size)
+    return new_x, new_y
 
-    return (int(tileWidth), int(tileHeight))
+
+def calc_tile_size(resolution, grid_size):
+    width, height = grid_size
+    tile_width = int((resolution[0] / width))
+    tile_height = int((resolution[1] / height))
+
+    return tile_width, tile_height
 
 
-def makeMap(resolution, blocksize):
+def make_coord_mapping(resolution, tile_size):
     # uses bidict to have a key<->key pairing for screen to game coordinates
-    gridPos = 0
-    mapDict = {}
+    grid_pos = 0
+    map_dict = {}
 
-    for x in range(0, resolution[0], blocksize):
-        mapDict[range(x, x + blocksize)] = gridPos
-        gridPos += 1
+    for x in range(0, resolution[0], tile_size):
+        map_dict[range(x, x + tile_size)] = grid_pos
+        grid_pos += 1
 
-    return bidict(mapDict)
+    return bidict(map_dict)
