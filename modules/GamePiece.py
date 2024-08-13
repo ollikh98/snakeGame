@@ -13,11 +13,11 @@ STILL = (0, 0)
 
 
 class GamePiece(pygame.sprite.Sprite):
-    def __init__(self, grid: bidict, game_pos: tuple, size: int, color: str, direction: tuple = STILL):
-        self.grid = grid
-        self.grid_size = len(grid)
+    def __init__(self, coord_mapping: bidict, game_pos: tuple, size: int, color: str, direction: tuple = STILL):
+        self.coord_mapping = coord_mapping
+        self.grid_size = len(coord_mapping)
         self.game_pos = game_pos
-        self.screen_pos = Utils.gameToScreenCord(self.grid, self.game_pos)
+        self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, self.game_pos)
         self.color = color
         self.size = size
         self.rect = pygame.Rect(self.screen_pos[0], self.screen_pos[1], size, size)
@@ -26,26 +26,26 @@ class GamePiece(pygame.sprite.Sprite):
 
     def update(self, new_pos):
         self.game_pos = new_pos
-        self.screen_pos = Utils.gameToScreenCord(self.grid, new_pos)
+        self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, new_pos)
 
     def move(self):
         new_pos = tuple(np.add(self.game_pos, self.direction))
         self.game_pos = new_pos
-        self.screen_pos = Utils.gameToScreenCord(self.grid, self.game_pos)
+        self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, self.game_pos)
 
     def draw(self, screen):
         self.rect.update(self.screen_pos, (self.size, self.size))
         pygame.draw.rect(screen, self.color, self.rect)
 
     def detect_collision(self):
-        if (self.game_pos[0] not in self.grid.inverse) or (self.game_pos[1] not in self.grid.inverse):
+        if (self.game_pos[0] not in self.coord_mapping.inverse) or (self.game_pos[1] not in self.coord_mapping.inverse):
             print('attempting to go out of bounds')
             return True
 
     def __str__(self):
         return (
             f' Gamepiece attributes: \n'
-            f' grid: {self.grid} \n'
+            f' coord_mapping: {self.coord_mapping} \n'
             f' game_pos: {self.game_pos} \n'
             f' screen_pos: {self.screen_pos} \n'
             f' color: {self.color} \n'
@@ -55,22 +55,22 @@ class GamePiece(pygame.sprite.Sprite):
 
 
 class Apple(GamePiece):
-    def __init__(self, grid, size, color):
-        super().__init__(grid, Utils.generateRandomGamePos(grid), size, color)
+    def __init__(self, coord_mapping, size, color):
+        super().__init__(coord_mapping, Utils.generateRandomGamePos(coord_mapping), size, color)
 
     def collected(self, head_pos):
         # TODO: write logic so that apple can't spawn inside snake
         if head_pos == self.game_pos:
-            self.game_pos = Utils.generateRandomGamePos(self.grid)
+            self.game_pos = Utils.generateRandomGamePos(self.coord_mapping)
             self.game_pos = (randint(0, self.grid_size - 1), randint(0, self.grid_size - 1))
-            self.screen_pos = Utils.gameToScreenCord(self.grid, self.game_pos)
+            self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, self.game_pos)
             return True
         return False
 
 
 class Snake:
-    def __init__(self, grid, pos, size):
-        self.head = GamePiece(grid, pos, size, 'green')
+    def __init__(self, coord_mapping, pos, size):
+        self.head = GamePiece(coord_mapping, pos, size, 'green')
         self.body = []
         self.body.append(self.head)
         self.movement_ticker = 0
@@ -79,7 +79,7 @@ class Snake:
     def extend(self):
         last_piece = self.body[-1]
         new_piece_pos = tuple(np.subtract(last_piece.game_pos, last_piece.direction))
-        new_piece = GamePiece(last_piece.grid, new_piece_pos, last_piece.size, color='green',
+        new_piece = GamePiece(last_piece.coord_mapping, new_piece_pos, last_piece.size, color='green',
                               direction=last_piece.direction)
         self.body[-1].next = new_piece
         self.body.append(new_piece)

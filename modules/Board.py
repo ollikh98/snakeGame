@@ -9,14 +9,14 @@ class Board:
     # TODO:
     #  setup 1/3 of the screen to be dedicated scoreboard: score, snake length, direction, key press etc.
     #  Maybe try interactive sliders on the side to adjust while screen still active?
-    def __init__(self, grid, resolution, grid_size, tile_size, snake: Snake, apple: Apple):
+    def __init__(self, coord_mapping, resolution, grid_size, tile_size, snake: Snake, apple: Apple):
         self.resolution = resolution
         self.width = grid_size[0]
         self.height = grid_size[1]
         self.snake = snake
         self.apple = apple
         self.tile_size = tile_size
-        self.grid = grid
+        self.coord_mapping = coord_mapping
         self.board = pygame.display.set_mode(self.resolution)
         self.board.fill(BLACK)
         self.draw_grid()

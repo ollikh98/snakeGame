@@ -1,25 +1,25 @@
 import random
 from bidict import bidict
-def screenToGameCoord(map, pos):
+def screenToGameCoord(coord_mapping, pos):
     x, y = pos
-    gameX = [map[screenPos] for screenPos in map if x in screenPos][0]
-    gameY = [map[screenPos] for screenPos in map if y in screenPos][0]
+    gameX = [coord_mapping[screenPos] for screenPos in coord_mapping if x in screenPos][0]
+    gameY = [coord_mapping[screenPos] for screenPos in coord_mapping if y in screenPos][0]
 
     return (gameX, gameY)
 
 
-def gameToScreenCord(map,pos):
+def gameToScreenCord(coord_mapping,pos):
     x, y = pos
 
-    screenX = map.inverse[x]
-    screenY = map.inverse[y]
+    screenX = coord_mapping.inverse[x]
+    screenY = coord_mapping.inverse[y]
     screenX = screenX[0]
     screenY = screenY[0]
 
     return (screenX, screenY)
 
-def generateRandomGamePos(map):
-    mapsize = len(map)-1
+def generateRandomGamePos(coord_mapping):
+    mapsize = len(coord_mapping)-1
     newX = random.randint(0,mapsize)
     newY = random.randint(0, mapsize)
     return (newX,newY)
