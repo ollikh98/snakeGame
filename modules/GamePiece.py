@@ -20,7 +20,7 @@ class GamePiece(pygame.sprite.Sprite):
         self.color = color
         self.size = size
         self.rect = pygame.Rect(self.screenPos[0], self.screenPos[1], size, size)
-        self.next = self
+        self.next = None
         self.dir = dir
         self.prevDir = dir
 
@@ -29,7 +29,6 @@ class GamePiece(pygame.sprite.Sprite):
         self.screenPos = Utils.gameToScreenCord(self.map, newGamePos)
 
     def movePiece(self):
-        print(self.gamePos)
         newPos = tuple(np.add(self.gamePos,self.dir))
         self.gamePos = newPos
         self.screenPos = Utils.gameToScreenCord(self.map,self.gamePos)
@@ -107,13 +106,13 @@ class Snake():
 
         # no key pressed and time to move
         if self.movementTicker >= 20:
-            print('can move')
             self.canMove = True
 
         if self.canMove:
-            for piece in self.body:
-                print(piece.dir)
+            for piece in self.body[::-1]:
                 piece.movePiece()
+                if piece.next:
+                    piece.next.dir = piece.dir
             self.canMove = False
             self.movementTicker = 0
 
