@@ -6,6 +6,9 @@ WHITE = (200, 200, 200)
 
 # Board keeps track of active pieces, and drawing/frame updates
 class Board:
+    #TODO:
+    # setup 1/3 of the screen to be dedicated to a score, and other statistics
+    # Maybe try interactive sliders on the side to adjust while screen still active?
     def __init__(self, map, resolution, map_size, tilesize, snake: Snake, apple: Apple):
         self.resolution = resolution
         self.width = map_size[0]

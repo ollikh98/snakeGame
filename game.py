@@ -27,11 +27,11 @@ def gamestart():
 
     return board
 def runGame(snake, apple):
-    appleCollected = apple.collected(snake.head.gamePos)
+    appleCollected = apple.collected(snake.head.game_pos)
     if appleCollected:
-        snake.addBody()
-    collisionDetection = snake.move()
-    return collisionDetection
+        snake.extend()
+    snake.move()
+    return snake.collision()
 
 
 if __name__ == "__main__":
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         board = gamestart()
         while True:
             collision = runGame(board.snake, board.apple)
-            if collision == -1:
+            if collision:
                 print('COLLISION - RESTARTING')
                 break
             for event in pygame.event.get():
