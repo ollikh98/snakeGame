@@ -9,28 +9,27 @@ class Board:
     #TODO:
     # setup 1/3 of the screen to be dedicated to a score, and other statistics
     # Maybe try interactive sliders on the side to adjust while screen still active?
-    def __init__(self, map, resolution, map_size, tilesize, snake: Snake, apple: Apple):
+    def __init__(self, grid, resolution, grid_size, tile_size, snake: Snake, apple: Apple):
         self.resolution = resolution
-        self.width = map_size[0]
-        self.height = map_size[1]
+        self.width = grid_size[0]
+        self.height = grid_size[1]
         self.snake = snake
         self.apple = apple
-        self.tilesize = tilesize
-        self.map = map
+        self.tile_size = tile_size
+        self.grid = grid
         self.board = pygame.display.set_mode(self.resolution)
         self.board.fill(BLACK)
-        self.drawGrid()
+        self.draw_grid()
 
-
-    def drawGrid(self):
-        for x in range(0, self.resolution[0], self.tilesize):
-            for y in range(0, self.resolution[1], self.tilesize):
-                rect = pygame.Rect(x, y, self.tilesize, self.tilesize)
+    def draw_grid(self):
+        for x in range(0, self.resolution[0], self.tile_size):
+            for y in range(0, self.resolution[1], self.tile_size):
+                rect = pygame.Rect(x, y, self.tile_size, self.tile_size)
                 pygame.draw.rect(self.board, WHITE, rect, 1)
 
-    def updateFrame(self):
+    def update(self):
         self.board.fill(BLACK)
-        self.drawGrid()
+        self.draw_grid()
         self.snake.draw(self.board)
         self.apple.draw(self.board)
 
