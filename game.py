@@ -27,7 +27,7 @@ def game_init():
 
 
 def game_loop(snake, apple):
-    apple_collected = apple.collected(snake.head.game_pos)
+    apple_collected = apple.collected(snake.head.game_pos,snake.occupied_tiles)
     if apple_collected:
         snake.extend()
     snake.move()

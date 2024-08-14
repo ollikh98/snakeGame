@@ -58,11 +58,13 @@ class Apple(GamePiece):
     def __init__(self, coord_mapping, size, color):
         super().__init__(coord_mapping, Utils.random_game_pos(coord_mapping), size, color)
 
-    def collected(self, head_pos):
-        # TODO: write logic so that apple can't spawn inside snake
+    def collected(self, head_pos, occupied_tiles):
         if head_pos == self.game_pos:
             self.game_pos = Utils.random_game_pos(self.coord_mapping)
-            self.game_pos = (randint(0, self.grid_size - 1), randint(0, self.grid_size - 1))
+            while self.game_pos in occupied_tiles:
+                apple_pos_error = f"attempted apple in snake: {self.game_pos}"
+                print(apple_pos_error)
+                self.game_pos = Utils.random_game_pos(self.coord_mapping)
             self.screen_pos = Utils.game_to_screen_coord(self.coord_mapping, self.game_pos)
             return True
         return False
@@ -75,6 +77,8 @@ class Snake:
         self.body.append(self.head)
         self.movement_ticker = 0
         self.moved = False
+        self.occupied_tiles = []
+        self.occupied_tiles.append(self.head.game_pos)
 
     def extend(self):
         last_piece = self.body[-1]
@@ -83,6 +87,7 @@ class Snake:
                               direction=last_piece.direction)
         self.body[-1].next = new_piece
         self.body.append(new_piece)
+        self.occupied_tiles.append(new_piece_pos)
 
     def move(self):
 
@@ -107,10 +112,12 @@ class Snake:
             return
 
         self.moved = False
+        self.occupied_tiles = []
         for piece in self.body[::-1]:
             piece.move()
             if piece.next:
                 piece.next.direction = piece.direction
+            self.occupied_tiles.append(piece.game_pos)
         self.movement_ticker = 0
 
     def collision(self):
