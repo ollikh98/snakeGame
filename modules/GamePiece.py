@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from random import randint
+from random import choice
 import bidict
 from modules import Utils
 
@@ -10,6 +10,8 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 STILL = (0, 0)
+POSSIBLE_DIRECTIONS = [UP,DOWN,LEFT,RIGHT]
+OPPOSING_DIRECTIONS = {UP: DOWN, DOWN: UP, LEFT: RIGHT, RIGHT: LEFT}
 
 
 class GamePiece(pygame.sprite.Sprite):
@@ -31,11 +33,14 @@ class GamePiece(pygame.sprite.Sprite):
     def move(self):
         new_pos = tuple(np.add(self.game_pos, self.direction))
         self.game_pos = new_pos
+        collision = self.detect_collision()
+        if collision:
+            return True
         self.screen_pos = Utils.game_to_screen_coord(self.coord_mapping, self.game_pos)
 
     def draw(self, screen):
         self.rect.update(self.screen_pos, (self.size, self.size))
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.color, self.rect, 5)
 
     def detect_collision(self):
         if (self.game_pos[0] not in self.coord_mapping.inverse) or (self.game_pos[1] not in self.coord_mapping.inverse):
@@ -72,7 +77,7 @@ class Apple(GamePiece):
 
 class Snake:
     def __init__(self, coord_mapping, pos, size):
-        self.head = GamePiece(coord_mapping, pos, size, 'green')
+        self.head = GamePiece(coord_mapping, pos, size, 'blue')
         self.body = []
         self.body.append(self.head)
         self.movement_ticker = 0
@@ -81,18 +86,34 @@ class Snake:
         self.occupied_tiles.append(self.head.game_pos)
 
     def extend(self):
+        # TODO: fix error where new tile crashes game because it tries to spawn outside of board
         last_piece = self.body[-1]
+        direction = last_piece.direction
+        tried_directions = []
         new_piece_pos = tuple(np.subtract(last_piece.game_pos, last_piece.direction))
+        new_piece_pos = (int(new_piece_pos[0]),int(new_piece_pos[1]))
+        print(new_piece_pos)
+        while new_piece_pos[0] not in last_piece.coord_mapping.inverse or \
+                new_piece_pos[1] not in last_piece.coord_mapping.inverse:
+
+            tried_directions.append(direction)
+            direction = choice(POSSIBLE_DIRECTIONS)
+            if direction in tried_directions:
+                continue
+            new_piece_pos = tuple(np.subtract(last_piece.game_pos, direction))
+            print('new direction')
+            print(new_piece_pos)
+
         new_piece = GamePiece(last_piece.coord_mapping, new_piece_pos, last_piece.size, color='green',
-                              direction=last_piece.direction)
+                              direction=direction)
         self.body[-1].next = new_piece
         self.body.append(new_piece)
         self.occupied_tiles.append(new_piece_pos)
 
-    def move(self):
+    def slither(self):
 
         # TODO: by pressing keys fast oen can reverse direction without intermediate step.
-        #  set up logic so that oen has to move to next coord before next step is allowed
+        #  set up logic so that one has to move to next coord before next step is allowed
         self.movement_ticker += 1
 
         keys = pygame.key.get_pressed()
@@ -109,16 +130,20 @@ class Snake:
 
         # TODO: set movement_ticker as a function of map size, find reasonable function
         if self.movement_ticker < 20:
-            return
+            return True
 
         self.moved = False
         self.occupied_tiles = []
         for piece in self.body[::-1]:
-            piece.move()
+            collision = piece.move()
+            if collision:
+                return False
             if piece.next:
                 piece.next.direction = piece.direction
             self.occupied_tiles.append(piece.game_pos)
         self.movement_ticker = 0
+
+        return True
 
     def collision(self):
         return self.head.detect_collision()

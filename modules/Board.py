@@ -4,7 +4,7 @@ from modules.GamePiece import Snake, Apple
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 
-# Board keeps track of active pieces, and drawing/frame updates
+
 class Board:
     # TODO:
     #  setup 1/3 of the screen to be dedicated scoreboard: score, snake length, direction, key press etc.
