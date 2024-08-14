@@ -17,7 +17,7 @@ class GamePiece(pygame.sprite.Sprite):
         self.coord_mapping = coord_mapping
         self.grid_size = len(coord_mapping)
         self.game_pos = game_pos
-        self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, self.game_pos)
+        self.screen_pos = Utils.game_to_screen_coord(self.coord_mapping, self.game_pos)
         self.color = color
         self.size = size
         self.rect = pygame.Rect(self.screen_pos[0], self.screen_pos[1], size, size)
@@ -26,12 +26,12 @@ class GamePiece(pygame.sprite.Sprite):
 
     def update(self, new_pos):
         self.game_pos = new_pos
-        self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, new_pos)
+        self.screen_pos = Utils.game_to_screen_coord(self.coord_mapping, new_pos)
 
     def move(self):
         new_pos = tuple(np.add(self.game_pos, self.direction))
         self.game_pos = new_pos
-        self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, self.game_pos)
+        self.screen_pos = Utils.game_to_screen_coord(self.coord_mapping, self.game_pos)
 
     def draw(self, screen):
         self.rect.update(self.screen_pos, (self.size, self.size))
@@ -56,14 +56,14 @@ class GamePiece(pygame.sprite.Sprite):
 
 class Apple(GamePiece):
     def __init__(self, coord_mapping, size, color):
-        super().__init__(coord_mapping, Utils.generateRandomGamePos(coord_mapping), size, color)
+        super().__init__(coord_mapping, Utils.random_game_pos(coord_mapping), size, color)
 
     def collected(self, head_pos):
         # TODO: write logic so that apple can't spawn inside snake
         if head_pos == self.game_pos:
-            self.game_pos = Utils.generateRandomGamePos(self.coord_mapping)
+            self.game_pos = Utils.random_game_pos(self.coord_mapping)
             self.game_pos = (randint(0, self.grid_size - 1), randint(0, self.grid_size - 1))
-            self.screen_pos = Utils.gameToScreenCord(self.coord_mapping, self.game_pos)
+            self.screen_pos = Utils.game_to_screen_coord(self.coord_mapping, self.game_pos)
             return True
         return False
 
