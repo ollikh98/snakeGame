@@ -10,7 +10,7 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 STILL = (0, 0)
-POSSIBLE_DIRECTIONS = [UP,DOWN,LEFT,RIGHT]
+POSSIBLE_DIRECTIONS = [UP, DOWN, LEFT, RIGHT]
 OPPOSING_DIRECTIONS = {UP: DOWN, DOWN: UP, LEFT: RIGHT, RIGHT: LEFT}
 
 
@@ -91,7 +91,7 @@ class Snake:
         direction = last_piece.direction
         tried_directions = []
         new_piece_pos = tuple(np.subtract(last_piece.game_pos, last_piece.direction))
-        new_piece_pos = (int(new_piece_pos[0]),int(new_piece_pos[1]))
+        new_piece_pos = (int(new_piece_pos[0]), int(new_piece_pos[1]))
         print(new_piece_pos)
         while new_piece_pos[0] not in last_piece.coord_mapping.inverse or \
                 new_piece_pos[1] not in last_piece.coord_mapping.inverse:
@@ -132,7 +132,6 @@ class Snake:
         if self.movement_ticker < 20:
             return True
 
-        self.moved = False
         self.occupied_tiles = []
         for piece in self.body[::-1]:
             collision = piece.move()
@@ -151,4 +150,3 @@ class Snake:
     def draw(self, screen):
         for part in self.body:
             part.draw(screen)
-        self.moved = True
