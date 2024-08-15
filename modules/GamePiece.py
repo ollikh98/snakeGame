@@ -75,6 +75,7 @@ class Apple(GamePiece):
         return False
 
 
+
 class Snake:
     def __init__(self, coord_mapping, pos, size):
         self.head = GamePiece(coord_mapping, pos, size, 'blue')
